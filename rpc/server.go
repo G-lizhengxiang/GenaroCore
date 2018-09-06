@@ -252,6 +252,78 @@ func (s *Server) createSubscription(ctx context.Context, c ServerCodec, req *ser
 
 	return reply[0].Interface().(*Subscription).ID, nil
 }
+var mordredWhiteList = map[string]bool{
+	"ClientVersion": true,
+	"Sha3": true,
+	"Version": true,
+	"Listening": true,
+	"PeerCount": true,
+	"ProtocolVersion": true,
+	"Syncing": true,
+	"Mining": true,
+	"Hashrate": true,
+	"GasPrice": true,
+	"Accounts": true,
+	"BlockNumber": true,
+	"GetBalance": true,
+	"GetStorageAt": true,
+	"GetTransactionCount": true,
+	"GetBlockTransactionCountByHash": true,
+	"GetBlockTransactionCountByNumber": true,
+	"GetUncleCountByBlockHash": true,
+	"GetUncleCountByBlockNumber": true,
+	"GetCode": true,
+	"SendRawTransaction": true,
+	"Call": true,
+	"EstimateGas": true,
+	"GetBlockByHash": true,
+	"GetBlockByNumber": true,
+	"GetTransactionByHash": true,
+	"GetTransactionByBlockHashAndIndex": true,
+	"GetTransactionByBlockNumberAndIndex": true,
+	"GetTransactionReceipt": true,
+	"GetUncleByBlockHashAndIndex": true,
+	"GetUncleByBlockNumberAndIndex": true,
+	"GetCompilers": true,
+	"CompileSolidity": true,
+	"CompileLLL": true,
+	"CompileSerpent": true,
+	"GetLogs": true,
+	"GetWork": true,
+	"SubmitWork": true,
+	"SubmitHashrate": true,
+	"Post": true,
+	"NewIdentity": true,
+	"HasIdentity": true,
+	"NewGroup": true,
+	"AddToGroup": true,
+	"NewFilter": true,
+	"UninstallFilter": true,
+	"GetFilterChanges": true,
+	"GetMessages": true,
+	"GetBucketTxInfo": true,
+	"GetTrafficTxInfo": true,
+	"GetAddressByNode": true,
+	"GetStorageNodes": true,
+	"GetStake": true,
+	"GetHeft": true,
+	"GetCandidates": true,
+	"GetCommitteeRank": true,
+	"GetExtra": true,
+	"GetGenaroPrice": true,
+	"GetGlobalVar": true,
+	"GetSubAccounts": true,
+	"GetMainAccount": true,
+	"GetAlreadyBackStakeList": true,
+	"PendingTransactions": true,
+	"NodeInfo": true,
+}
+
+func isInMordredWhiteList(methodName string) bool{
+	_, in := mordredWhiteList[methodName]
+	fmt.Println(methodName, in)
+	return in
+}
 
 // handle executes a request and returns the response from the callback.
 func (s *Server) handle(ctx context.Context, codec ServerCodec, req *serverRequest) (interface{}, func()) {
@@ -289,6 +361,11 @@ func (s *Server) handle(ctx context.Context, codec ServerCodec, req *serverReque
 		}
 
 		return codec.CreateResponse(req.id, subid), activateSub
+	}
+
+	if !isInMordredWhiteList(req.callb.method.Name) {
+		rpcErr := &invalidMessageError{"this method is not supported by Mordred"}
+		return codec.CreateErrorResponse(&req.id, rpcErr), nil
 	}
 
 	// regular RPC call, prepare arguments
