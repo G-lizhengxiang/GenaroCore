@@ -32,7 +32,7 @@ var (
 )
 
 var (
-	OfficialAddress Address = HexToAddress("0x174d246ee47ee21b4fd785b91406186e8777912f")
+	OfficialAddress Address = HexToAddress("0xad188b762f9e3ef76c972960b80c9dc99b9cfc73")
 )
 
 /*
@@ -141,5 +141,5 @@ var (
 	CoinRewardsRatio    = uint64(50)
 	StorageRewardsRatio = uint64(50)
 	RatioPerYear        = uint64(7)
-	SynStateAccount     = OfficialAddress
+	BlockLogLenth       = uint64(300000)
 )
